@@ -33,6 +33,14 @@ const handler = route(async (req, res) => {
       ? body.folder.trim().replace(/^\/+|\/+$/g, '')
       : 'personal-gallery';
 
+  // Images keep the historic signature shape ({timestamp, folder}) so
+  // existing uploads are unaffected. Videos opt in with resource_type.
+  const resourceType = body.resource_type === 'video' ? 'video' : 'image';
+
+  // IMPORTANT: resource_type must NOT be part of the signature. Cloudinary
+  // derives the resource type from the upload URL path (/video/upload) and
+  // excludes it from the signed string — signing it causes "Invalid
+  // Signature". Only folder + timestamp are signed, for images and videos.
   const timestamp = Math.round(Date.now() / 1000);
   const paramsToSign = { timestamp, folder };
 
@@ -45,7 +53,7 @@ const handler = route(async (req, res) => {
     timestamp,
     signature,
     folder,
-    resource_type: 'image',
+    resource_type: resourceType,
   });
 });
 

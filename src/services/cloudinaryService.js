@@ -1,19 +1,12 @@
-import { supabase } from '../lib/supabase';
+import { getToken } from '../lib/authToken';
 import { env } from '../lib/env';
 
 // All destructive/signed Cloudinary operations go through our serverless API
 // (/api) — the API secret never leaves the server (spec §9, §18).
 
 async function apiFetch(path, body) {
-  if (!supabase) {
-    throw new Error(
-      'Supabase is not configured on the frontend. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to your .env file.',
-    );
-  }
-
-  // Get the admin's Supabase session token to authorize the API call.
-  const { data } = await supabase.auth.getSession();
-  const token = data?.session?.access_token || '';
+  // The admin JWT authorizes the API call (Supabase sessions are gone).
+  const token = getToken();
 
   // AbortController timeout — fetch should never hang indefinitely.
   const controller = new AbortController();
@@ -40,7 +33,7 @@ async function apiFetch(path, body) {
     clearTimeout(timeoutId);
     if (err.name === 'AbortError') {
       throw new Error(
-        'The upload request timed out. Check that the API server is running (npm run dev starts both Vite and the API on :3001). If it is, verify your server-side environment variables in .env (SUPABASE_SERVICE_ROLE_KEY, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET).',
+        'The upload request timed out. Check that the API server is running (npm run dev starts both Vite and the API on :3001). If it is, verify your server-side environment variables in .env (DATABASE_URL, JWT_SECRET, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET).',
       );
     }
     throw err;
@@ -52,11 +45,14 @@ async function apiFetch(path, body) {
  * Cloudinary. Returns normalized asset metadata (spec §9, §68).
  *
  * @param {File} file
- * @param {object} [opts] { folder }
+ * @param {object} [opts]
+ * @param {string} [opts.folder]
+ * @param {'image'|'video'} [opts.resourceType]  'video' for reels
  */
-export async function uploadToCloudinary(file, { folder, onProgress: _onProgress } = {}) {
+export async function uploadToCloudinary(file, { folder, resourceType = 'image', onProgress: _onProgress } = {}) {
   const signed = await apiFetch('/api/cloudinary/sign', {
     folder: folder || env.cloudinaryUploadFolder,
+    ...(resourceType === 'video' ? { resource_type: 'video' } : {}),
   });
 
   const form = new FormData();
@@ -65,11 +61,16 @@ export async function uploadToCloudinary(file, { folder, onProgress: _onProgress
   form.append('timestamp', String(signed.timestamp));
   form.append('signature', signed.signature);
   form.append('folder', signed.folder);
+  // NOTE: do NOT append resource_type here — Cloudinary excludes it from the
+  // signature (the /video/upload URL path already selects it), so sending it
+  // as a param is unnecessary.
 
-  const uploadUrl = `https://api.cloudinary.com/v1_1/${signed.cloud_name}/image/upload`;
+  const uploadUrl = `https://api.cloudinary.com/v1_1/${signed.cloud_name}/${signed.resource_type || 'image'}/upload`;
 
   const uploadController = new AbortController();
-  const uploadTimeout = setTimeout(() => uploadController.abort(), 60000); // 60s for the actual CDN upload
+  // Videos can be much larger than images — give them a longer runway.
+  const uploadLimitMs = signed.resource_type === 'video' ? 300000 : 60000;
+  const uploadTimeout = setTimeout(() => uploadController.abort(), uploadLimitMs);
 
   try {
     const res = await fetch(uploadUrl, {
@@ -93,6 +94,8 @@ export async function uploadToCloudinary(file, { folder, onProgress: _onProgress
       height: asset.height ?? null,
       format: asset.format ?? null,
       file_size: asset.bytes ?? null,
+      // Video-only metadata (Cloudinary reports duration for video assets).
+      ...(asset.duration !== undefined ? { duration: asset.duration } : {}),
     };
   } catch (err) {
     clearTimeout(uploadTimeout);
@@ -105,7 +108,20 @@ export async function uploadToCloudinary(file, { folder, onProgress: _onProgress
   }
 }
 
-/** Permanently remove a Cloudinary asset (admin-only, server-verified). */
-export async function deleteCloudinaryAsset(publicId) {
-  return apiFetch('/api/cloudinary/delete', { public_id: publicId });
+/** Upload a video asset (reels). Same signed flow, resource_type = video. */
+export function uploadVideoToCloudinary(file, opts = {}) {
+  return uploadToCloudinary(file, { ...opts, resourceType: 'video' });
+}
+
+/**
+ * Permanently remove a Cloudinary asset (admin-only, server-verified).
+ * @param {string} publicId
+ * @param {object} [opts]
+ * @param {'image'|'video'} [opts.resourceType]
+ */
+export async function deleteCloudinaryAsset(publicId, { resourceType = 'image' } = {}) {
+  return apiFetch('/api/cloudinary/delete', {
+    public_id: publicId,
+    ...(resourceType === 'video' ? { resource_type: 'video' } : {}),
+  });
 }

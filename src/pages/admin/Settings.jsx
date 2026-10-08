@@ -64,7 +64,7 @@ export default function Settings() {
     <div className="mx-auto max-w-3xl space-y-6">
       <header>
         <h1 className="font-display text-2xl font-semibold">Settings</h1>
-        <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">Site-wide configuration stored in Supabase.</p>
+        <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">Site-wide configuration stored in PostgreSQL.</p>
       </header>
 
       <form onSubmit={onSubmit} className="space-y-5 rounded-2xl border border-stone-200 bg-white p-6 dark:border-stone-800 dark:bg-stone-900">

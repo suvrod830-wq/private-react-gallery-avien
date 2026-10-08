@@ -5,7 +5,7 @@ import { categoryService } from '../../services/categoryService';
 import { tagService } from '../../services/tagService';
 import { authorService } from '../../services/authorService';
 import { albumService } from '../../services/albumService';
-import { isCloudinaryConfigured, isSupabaseConfigured } from '../../lib/env';
+import { isCloudinaryConfigured, isConfigured } from '../../lib/env';
 import { ConfigMissing, ErrorState, Spinner } from '../../components/ui/Feedback';
 
 export default function UploadImage() {
@@ -15,8 +15,8 @@ export default function UploadImage() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!isSupabaseConfigured) {
-      setError('Supabase is not configured. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to your .env file.');
+    if (!isConfigured) {
+      setError('The backend is not configured. Check DATABASE_URL, JWT_SECRET and the Cloudinary variables in your .env file, and make sure the API server is running.');
       setLoading(false);
       return;
     }
@@ -34,7 +34,7 @@ export default function UploadImage() {
         setLoading(false);
       })
       .catch((err) => {
-        const msg = err?.message || 'Failed to load categories, tags, authors, and albums from Supabase.';
+        const msg = err?.message || 'Failed to load categories, tags, authors, and albums from the API.';
         setError(msg);
         setLoading(false);
       });
@@ -53,7 +53,7 @@ export default function UploadImage() {
       <header>
         <h1 className="font-display text-2xl font-semibold">Upload images</h1>
         <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">
-          Files go to Cloudinary; metadata is saved to Supabase. A failed upload never blocks the others.
+          Files go to Cloudinary; metadata is saved to the PostgreSQL database. A failed upload never blocks the others.
         </p>
       </header>
 

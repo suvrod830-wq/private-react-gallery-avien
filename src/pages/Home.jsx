@@ -6,7 +6,7 @@ import { getFeaturedImages, getLatestImages } from '../services/imageService';
 import { categoryService } from '../services/categoryService';
 import { tagService } from '../services/tagService';
 import { albumService } from '../services/albumService';
-import { isSupabaseConfigured } from '../lib/env';
+import { isConfigured } from '../lib/env';
 import { ImageGrid } from '../components/gallery/ImageGrid';
 import { GallerySkeleton } from '../components/gallery/GallerySkeleton';
 import { ConfigMissing } from '../components/ui/Feedback';
@@ -25,7 +25,7 @@ export default function Home() {
   const { showPoster } = usePoster();
 
   useEffect(() => {
-    if (!isSupabaseConfigured) return;
+    if (!isConfigured) return;
     let active = true;
     Promise.all([
       getFeaturedImages(6),
@@ -93,9 +93,9 @@ export default function Home() {
         </div>
       </section>
 
-      {!isSupabaseConfigured ? (
+      {!isConfigured ? (
         <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
-          <ConfigMissing message="Connect Supabase and Cloudinary (see README.md) and the gallery will appear here." />
+          <ConfigMissing message="Configure the backend and Cloudinary (see README.md) and the gallery will appear here." />
         </div>
       ) : error ? (
         <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6">

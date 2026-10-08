@@ -1,20 +1,11 @@
-import { supabase } from '../lib/supabase';
-
 /**
- * Record an admin activity (spec §63). The database function is
- * security-definer and silently no-ops for non-admins, so a leaked call
- * cannot write rows the caller shouldn't be able to.
+ * Activity logging now happens SERVER-SIDE: every /api handler that mutates
+ * data writes its own activity_logs row (with the authenticated admin's id).
+ * This client stub keeps old call sites compiling but does nothing — a
+ * browser asking the database to log "I did something" would be meaningless
+ * (and untrustworthy) now that RLS is gone.
  */
+// eslint-disable-next-line no-unused-vars
 export async function logActivity(action, entityType = null, entityId = null, metadata = null) {
-  if (!supabase) return;
-  try {
-    await supabase.rpc('log_activity', {
-      p_action: action,
-      p_entity_type: entityType,
-      p_entity_id: entityId,
-      p_metadata: metadata,
-    });
-  } catch {
-    // Activity logging must never break the primary operation.
-  }
+  // intentionally empty — the API is the source of truth for activity logs
 }

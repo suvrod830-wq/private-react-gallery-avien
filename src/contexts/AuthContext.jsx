@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { supabase, getSessionUser } from '../lib/supabase';
-import { fetchProfile } from '../services/authService';
-import { isSupabaseConfigured } from '../lib/env';
+import { AUTH_EXPIRED_EVENT } from '../lib/authToken';
+import { getCurrentProfile, fetchProfile } from '../services/authService';
+import { isConfigured } from '../lib/env';
 
 const AuthContext = createContext(null);
 
@@ -10,10 +10,11 @@ export function AuthProvider({ children }) {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const refreshProfile = useCallback(async (uid) => {
-    if (!isSupabaseConfigured) return null;
-    const p = await fetchProfile(uid);
+  const refreshProfile = useCallback(async () => {
+    if (!isConfigured) return null;
+    const p = await fetchProfile();
     setProfile(p);
+    setUser(p ? { id: p.id, email: p.email } : null);
     return p;
   }, []);
 
@@ -21,54 +22,37 @@ export function AuthProvider({ children }) {
     let active = true;
 
     async function init() {
-      if (!isSupabaseConfigured) {
-        setLoading(false);
-        return;
-      }
-
       try {
-        const userNow = await getSessionUser();
-
+        const { user: userNow, profile: profileNow } = await getCurrentProfile();
         if (!active) return;
-
         setUser(userNow);
-
-        if (userNow) {
-          await refreshProfile(userNow.id);
-        }
+        setProfile(profileNow);
       } catch (error) {
         console.error('Auth initialization failed:', error);
-
         if (active) {
           setUser(null);
           setProfile(null);
         }
       } finally {
-        if (active) {
-          setLoading(false);
-        }
+        if (active) setLoading(false);
       }
     }
 
     init();
 
-    if (!isSupabaseConfigured || !supabase) {
-      return () => {
-        active = false;
-      };
-    }
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
-      const next = session?.user ?? null;
-      setUser(next);
-      if (next) refreshProfile(next.id);
-      else setProfile(null);
-    });
+    // Token expired / rejected by the API → automatic sign-out.
+    const onExpired = () => {
+      setUser(null);
+      setProfile(null);
+      setLoading(false);
+    };
+    window.addEventListener(AUTH_EXPIRED_EVENT, onExpired);
 
     return () => {
       active = false;
-      sub?.subscription.unsubscribe();
+      window.removeEventListener(AUTH_EXPIRED_EVENT, onExpired);
     };
-  }, [refreshProfile]);
+  }, []);
 
   const value = useMemo(
     () => ({
@@ -76,7 +60,7 @@ export function AuthProvider({ children }) {
       profile,
       loading,
       isAdmin: Boolean(profile?.role === 'admin'),
-      isSupabaseConfigured,
+      isConfigured,
       refreshProfile,
     }),
     [user, profile, loading, refreshProfile],

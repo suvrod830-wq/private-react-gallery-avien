@@ -19,6 +19,13 @@ export const ALLOWED_IMAGE_EXTENSIONS = ['.jpg', '.jpeg', '.png', '.webp', '.avi
 
 export const MAX_UPLOAD_BYTES = 15 * 1024 * 1024; // 15 MB
 
+// Reels (short vertical videos — stored in Cloudinary as video assets)
+export const ALLOWED_VIDEO_TYPES = ['video/mp4', 'video/webm', 'video/quicktime', 'video/x-m4v'];
+
+export const ALLOWED_VIDEO_EXTENSIONS = ['.mp4', '.webm', '.mov', '.m4v'];
+
+export const MAX_VIDEO_UPLOAD_BYTES = 100 * 1024 * 1024; // 100 MB (Cloudinary free-tier video limit)
+
 export const SESSION_KEY = 'gallery_session_id';
 
 export const ROLES = ['user', 'admin'];
@@ -26,6 +33,7 @@ export const ROLES = ['user', 'admin'];
 export const PUBLIC_ROUTES = [
   { path: '/', label: 'Home' },
   { path: '/gallery', label: 'Gallery' },
+  { path: '/reels', label: 'Reels' },
   { path: '/categories', label: 'Categories' },
   { path: '/tags', label: 'Tags' },
   { path: '/authors', label: 'Authors' },

@@ -11,6 +11,7 @@ import {
   BookOpen,
   Eye,
   Activity,
+  Clapperboard,
 } from 'lucide-react';
 import { useDocumentTitle } from '../../hooks/useDocumentTitle';
 import { getDashboardStats, getRecentActivity, listImages } from '../../services/imageService';
@@ -61,7 +62,9 @@ export default function Dashboard() {
         { label: 'Tags', value: stats.tags, icon: Tags, tone: 'text-violet-500' },
         { label: 'Authors', value: stats.authors, icon: Users, tone: 'text-pink-500' },
         { label: 'Albums', value: stats.albums, icon: BookOpen, tone: 'text-indigo-500' },
+        { label: 'Reels', value: stats.total_reels ?? 0, icon: Clapperboard, tone: 'text-rose-500' },
         { label: 'Total Views', value: stats.total_views, icon: Eye, tone: 'text-teal-500' },
+        { label: 'Reel Views', value: stats.reel_views ?? 0, icon: Clapperboard, tone: 'text-orange-500' },
       ]
     : [];
 

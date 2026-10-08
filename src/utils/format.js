@@ -41,6 +41,18 @@ export function formatFileSize(bytes) {
   return formatBytes(bytes);
 }
 
+/** "1:05" / "12:34" from seconds (reel duration). */
+export function formatDuration(seconds) {
+  const total = Math.round(Number(seconds));
+  if (!Number.isFinite(total) || total <= 0) return '';
+  const h = Math.floor(total / 3600);
+  const m = Math.floor((total % 3600) / 60);
+  const s = total % 60;
+  const mm = h > 0 ? String(m).padStart(2, '0') : String(m);
+  const ss = String(s).padStart(2, '0');
+  return h > 0 ? `${h}:${mm}:${ss}` : `${mm}:${ss}`;
+}
+
 export function initials(name = '') {
   return name
     .split(/\s+/)
