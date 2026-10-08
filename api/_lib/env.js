@@ -1,5 +1,8 @@
 // Server-side environment reading. Runs only on Vercel / the local API server,
 // so these secrets are never exposed to the browser.
+//
+// Database: Aiven for PostgreSQL (DATABASE_URL). Auth: self-issued JWTs
+// signed with JWT_SECRET — there is NO Supabase anywhere in this stack.
 
 const read = (key) => {
   const v = process.env[key];
@@ -7,8 +10,8 @@ const read = (key) => {
 };
 
 export const serverEnv = {
-  supabaseUrl: read('VITE_SUPABASE_URL'),
-  supabaseServiceRoleKey: read('SUPABASE_SERVICE_ROLE_KEY'),
+  databaseUrl: read('DATABASE_URL'),
+  jwtSecret: read('JWT_SECRET'),
   cloudinaryCloudName: read('VITE_CLOUDINARY_CLOUD_NAME'),
   cloudinaryApiKey: read('CLOUDINARY_API_KEY'),
   cloudinaryApiSecret: read('CLOUDINARY_API_SECRET'),
@@ -23,10 +26,10 @@ export const serverReady = () => serverEnvErrors().length === 0;
  */
 export function serverEnvErrors() {
   const missing = [];
-  if (!serverEnv.supabaseUrl)
-    missing.push('VITE_SUPABASE_URL (your Supabase project URL)');
-  if (!serverEnv.supabaseServiceRoleKey)
-    missing.push('SUPABASE_SERVICE_ROLE_KEY (from Supabase Settings → API)');
+  if (!serverEnv.databaseUrl)
+    missing.push('DATABASE_URL (Aiven for PostgreSQL connection string)');
+  if (!serverEnv.jwtSecret)
+    missing.push('JWT_SECRET (generate one — see .env.example)');
   if (!serverEnv.cloudinaryCloudName)
     missing.push('VITE_CLOUDINARY_CLOUD_NAME (from Cloudinary Dashboard)');
   if (!serverEnv.cloudinaryApiKey)
@@ -34,4 +37,11 @@ export function serverEnvErrors() {
   if (!serverEnv.cloudinaryApiSecret)
     missing.push('CLOUDINARY_API_SECRET (from Cloudinary Dashboard — keep secret!)');
   return missing;
+}
+
+/** Just the database + auth essentials (everything except Cloudinary). */
+export function coreEnvErrors() {
+  return serverEnvErrors().filter(
+    (m) => m.startsWith('DATABASE_URL') || m.startsWith('JWT_SECRET'),
+  );
 }

@@ -44,7 +44,7 @@ export function ImageBroken({ className = 'h-8 w-8' }) {
 }
 
 /**
- * Shown when the app runs without real Supabase/Cloudinary keys.
+ * Shown when the app runs without a configured backend (API/Cloudinary).
  * This is an honest "not configured" state — there is no mock data.
  */
 export function ConfigMissing({ message }) {
@@ -57,7 +57,7 @@ export function ConfigMissing({ message }) {
         <h3 className="text-lg font-semibold text-amber-900 dark:text-amber-100">Backend not configured yet</h3>
         <p className="max-w-md text-sm text-amber-800 dark:text-amber-200">{message}</p>
         <p className="max-w-md text-xs text-amber-700 dark:text-amber-300">
-          This application uses real Supabase and Cloudinary integrations only — no sample data is shipped. See{' '}
+          This application uses real Aiven PostgreSQL and Cloudinary integrations only — no sample data is shipped. See{' '}
           <code className="rounded bg-amber-100 px-1 dark:bg-amber-900">README.md</code> and the{' '}
           <code className="rounded bg-amber-100 px-1 dark:bg-amber-900">.env.example</code> for the setup guide.
         </p>

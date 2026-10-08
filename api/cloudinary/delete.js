@@ -22,12 +22,13 @@ const handler = route(async (req, res) => {
 
   const body = await readJsonBody(req);
   const publicId = typeof body.public_id === 'string' ? body.public_id.trim() : '';
+  const resourceType = body.resource_type === 'video' ? 'video' : 'image';
 
   if (!publicId) {
     return json(res, 400, { error: 'public_id is required.' });
   }
 
-  const result = await cloudinary.uploader.destroy(publicId);
+  const result = await cloudinary.uploader.destroy(publicId, { resource_type: resourceType });
 
   if (result.result === 'not found') {
     // Idempotent success — the asset is already gone.

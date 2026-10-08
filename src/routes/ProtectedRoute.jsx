@@ -4,13 +4,14 @@ import { Spinner } from '../components/ui/Feedback';
 
 /**
  * UX-level route guard (spec §33: frontend protection is UX only — the real
- * security boundary is RLS + server-side admin verification).
+ * security boundary is the API layer, which verifies the JWT + admin role on
+ * every request).
  */
 export function ProtectedRoute({ children }) {
-  const { user, profile, loading, isSupabaseConfigured } = useAuth();
+  const { user, profile, loading, isConfigured } = useAuth();
   const location = useLocation();
 
-  if (!isSupabaseConfigured) {
+  if (!isConfigured) {
     return <Navigate to="/admin/login" replace />;
   }
   if (loading) {

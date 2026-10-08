@@ -3,7 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { ImageOff, ArrowLeft, ExternalLink } from "lucide-react";
 import { useDocumentTitle } from "../../hooks/useDocumentTitle";
 import { useImages } from "../../hooks/useImages";
-import { isSupabaseConfigured } from "../../lib/env";
+import { isConfigured } from "../../lib/env";
 import { ImageGrid } from "../gallery/ImageGrid";
 import { Lightbox } from "../gallery/Lightbox";
 import { GallerySkeleton } from "../gallery/GallerySkeleton";
@@ -45,7 +45,7 @@ export function TaxonomyDetail({
   });
 
   useEffect(() => {
-    if (!isSupabaseConfigured) return;
+    if (!isConfigured) return;
     let active = true;
     setEntityError(null);
     service
@@ -61,11 +61,11 @@ export function TaxonomyDetail({
     };
   }, [slug, service]);
 
-  if (!isSupabaseConfigured) {
+  if (!isConfigured) {
     return (
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
         <ConfigMissing
-          message={`Connect Supabase (see README.md) to view ${singular.toLowerCase()} pages.`}
+          message={`Configure the backend (see README.md) to view ${singular.toLowerCase()} pages.`}
         />
       </div>
     );

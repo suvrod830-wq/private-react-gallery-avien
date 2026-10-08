@@ -10,6 +10,7 @@ import { PosterProvider } from "./contexts/PosterContext";
 const Home = lazy(() => import("./pages/Home"));
 const Gallery = lazy(() => import("./pages/Gallery"));
 const ImageDetails = lazy(() => import("./pages/ImageDetails"));
+const Reels = lazy(() => import("./pages/Reels"));
 const Categories = lazy(() => import("./pages/Categories"));
 const CategoryDetails = lazy(() => import("./pages/CategoryDetails"));
 const Tags = lazy(() => import("./pages/Tags"));
@@ -25,6 +26,9 @@ const Dashboard = lazy(() => import("./pages/admin/Dashboard"));
 const AdminImages = lazy(() => import("./pages/admin/AdminImages"));
 const UploadImage = lazy(() => import("./pages/admin/UploadImage"));
 const EditImage = lazy(() => import("./pages/admin/EditImage"));
+const AdminReels = lazy(() => import("./pages/admin/AdminReels"));
+const UploadReel = lazy(() => import("./pages/admin/UploadReel"));
+const EditReel = lazy(() => import("./pages/admin/EditReel"));
 const AdminCategories = lazy(() => import("./pages/admin/AdminCategories"));
 const AdminTags = lazy(() => import("./pages/admin/AdminTags"));
 const AdminAuthors = lazy(() => import("./pages/admin/AdminAuthors"));
@@ -89,6 +93,9 @@ export default function App() {
                 <Route path="/" element={<Home />} />
                 <Route path="/gallery" element={<Gallery />} />
                 <Route path="/image/:slug" element={<ImageDetails />} />
+                <Route path="/reels" element={<Reels />} />
+                {/* Shared reel links open the feed with the popup player on that reel */}
+                <Route path="/reel/:slug" element={<Reels />} />
                 <Route path="/categories" element={<Categories />} />
                 <Route path="/category/:slug" element={<CategoryDetails />} />
                 <Route path="/tags" element={<Tags />} />
@@ -114,6 +121,9 @@ export default function App() {
                 <Route path="/admin/images" element={<AdminImages />} />
                 <Route path="/admin/images/upload" element={<UploadImage />} />
                 <Route path="/admin/images/:id/edit" element={<EditImage />} />
+                <Route path="/admin/reels" element={<AdminReels />} />
+                <Route path="/admin/reels/upload" element={<UploadReel />} />
+                <Route path="/admin/reels/:id/edit" element={<EditReel />} />
                 <Route path="/admin/categories" element={<AdminCategories />} />
                 <Route path="/admin/tags" element={<AdminTags />} />
                 <Route path="/admin/authors" element={<AdminAuthors />} />

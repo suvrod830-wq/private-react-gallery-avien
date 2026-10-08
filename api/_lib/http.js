@@ -1,6 +1,8 @@
 // Small HTTP helpers that work identically under Vercel serverless functions
 // and the local Express dev server.
 
+import { dbConfigured } from './db.js';
+
 export function json(res, status, body) {
   if (res.headersSent) return;
   res.status(status);
@@ -58,6 +60,36 @@ export function readJsonBody(req) {
   });
 }
 
+/**
+ * Guard for endpoints that need the database. Answers 503 and returns false
+ * when DATABASE_URL is missing, so handlers can `if (!requireDb(res)) return;`.
+ */
+export function requireDb(res) {
+  if (!dbConfigured()) {
+    json(res, 503, {
+      error:
+        'Database not configured. Add DATABASE_URL (Aiven for PostgreSQL) and JWT_SECRET to your .env, then restart the API server.',
+    });
+    return false;
+  }
+  if (!process.env.JWT_SECRET) {
+    json(res, 503, {
+      error: 'JWT_SECRET is not configured. Add it to your .env, then restart the API server.',
+    });
+    return false;
+  }
+  return true;
+}
+
+/** Map common Postgres error codes to friendly HTTP responses. */
+export function pgErrorToStatus(err) {
+  if (err?.code === '23505') return 409; // unique violation
+  if (err?.code === '23503') return 409; // foreign key violation
+  if (err?.code === '23502') return 400; // not null violation
+  if (err?.code === '22P02') return 400; // invalid input syntax (bad uuid etc.)
+  return 500;
+}
+
 /** Wrap an async handler with try/catch → consistent 500 responses. */
 export function route(fn) {
   return async (req, res) => {
@@ -65,6 +97,10 @@ export function route(fn) {
       await fn(req, res);
     } catch (err) {
       console.error('[api] unhandled error:', err);
+      const status = pgErrorToStatus(err);
+      if (status === 409) {
+        return json(res, 409, { error: err.message || 'Conflict.' });
+      }
       json(res, 500, { error: 'Something went wrong. Please try again.' });
     }
   };

@@ -51,3 +51,39 @@ export function cloudinarySquare(publicId, size = 256) {
 export function galleryImage(image, width) {
   return cloudinaryUrl({ publicId: image?.cloudinary_public_id, width });
 }
+
+// ---------------------------------------------------------------------------
+// Reels (video delivery)
+// ---------------------------------------------------------------------------
+
+const VIDEO_BASE = () => `https://res.cloudinary.com/${env.cloudinaryCloudName}/video/upload`;
+
+/** Streaming-friendly delivery URL for a reel video asset. */
+export function reelVideoUrl({ publicId, quality } = {}) {
+  if (!publicId) return '';
+  const parts = ['f_auto', 'q_auto'];
+  if (quality) parts.push(`q_${quality}`);
+  return `${VIDEO_BASE()}/${parts.join(',')}/${publicId}`;
+}
+
+/** The reel's source URL exactly as stored (no transformations). */
+export function reelOriginal(reel) {
+  return reel?.secure_url || (reel?.cloudinary_public_id ? reelVideoUrl({ publicId: reel.cloudinary_public_id }) : '');
+}
+
+/**
+ * Poster frame for a reel. Prefers a dedicated uploaded thumbnail; otherwise
+ * Cloudinary auto-extracts a frame from the video itself (`so_auto`).
+ */
+export function reelPoster(reel, width = 540) {
+  if (reel?.thumbnail_public_id) {
+    return cloudinaryUrl({ publicId: reel.thumbnail_public_id, width });
+  }
+  if (!reel?.cloudinary_public_id) return '';
+  return `${VIDEO_BASE()}/w_${width},so_auto/${reel.cloudinary_public_id}.jpg`;
+}
+
+/** Small poster for admin tables / lists. */
+export function reelThumb(reel, width = 90) {
+  return reelPoster(reel, width);
+}

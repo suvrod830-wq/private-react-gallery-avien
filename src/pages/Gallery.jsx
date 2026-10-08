@@ -4,7 +4,7 @@ import { ImageOff, SlidersHorizontal, X } from "lucide-react";
 import { useDocumentTitle } from "../hooks/useDocumentTitle";
 import { useDebounce } from "../hooks/useDebounce";
 import { useImages } from "../hooks/useImages";
-import { isSupabaseConfigured } from "../lib/env";
+import { isConfigured } from "../lib/env";
 import { FilterPanel } from "../components/filters/FilterPanel";
 import { MasonryGrid } from "../components/gallery/MasonryGrid";
 import { GallerySkeleton } from "../components/gallery/GallerySkeleton";
@@ -77,7 +77,7 @@ export default function Gallery() {
   const [lightboxIndex, setLightboxIndex] = useState(null);
 
   useEffect(() => {
-    if (!isSupabaseConfigured) return;
+    if (!isConfigured) return;
     let active = true;
     Promise.all([
       categoryService.listAll(),
@@ -139,7 +139,7 @@ export default function Gallery() {
     return () => obs.disconnect();
   }, [hasMore, loading, loadingMore, loadMore, items.length]);
 
-  const showStatusFilter = isAdmin && isSupabaseConfigured;
+  const showStatusFilter = isAdmin && isConfigured;
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
@@ -151,7 +151,7 @@ export default function Gallery() {
               Gallery
             </h1>
             <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">
-              {isSupabaseConfigured
+              {isConfigured
                 ? `${total} image${total === 1 ? "" : "s"} found`
                 : "Browse, search, and filter the collection."}
             </p>
@@ -181,8 +181,8 @@ export default function Gallery() {
         </div>
       </header>
 
-      {!isSupabaseConfigured ? (
-        <ConfigMissing message="Connect Supabase and Cloudinary (see README.md) and your gallery will load here." />
+      {!isConfigured ? (
+        <ConfigMissing message="Configure the backend and Cloudinary (see README.md) and your gallery will load here." />
       ) : (
         <>
           {/* Filter panel — collapsible */}

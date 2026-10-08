@@ -4,7 +4,7 @@ import { Camera, ImageOff } from 'lucide-react';
 import { useDocumentTitle } from '../../hooks/useDocumentTitle';
 import { cloudinaryUrl } from '../../lib/cloudinary';
 import { formatNumber } from '../../utils/format';
-import { isSupabaseConfigured } from '../../lib/env';
+import { isConfigured } from '../../lib/env';
 import { EmptyState, ErrorState, ConfigMissing, Spinner } from '../ui/Feedback';
 import { usePoster } from '../../contexts/PosterContext';
 
@@ -19,7 +19,7 @@ export function TaxonomyIndex({ title, description, service, routePrefix, entity
   const { showPoster } = usePoster();
 
   useEffect(() => {
-    if (!isSupabaseConfigured) return;
+    if (!isConfigured) return;
     let active = true;
     service
       .listWithCounts()
@@ -30,10 +30,10 @@ export function TaxonomyIndex({ title, description, service, routePrefix, entity
     };
   }, [service]);
 
-  if (!isSupabaseConfigured) {
+  if (!isConfigured) {
     return (
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
-        <ConfigMissing message={`Connect Supabase (see README.md) to list ${entityName.toLowerCase()}s.`} />
+        <ConfigMissing message={`Configure the backend (see README.md) to list ${entityName.toLowerCase()}s.`} />
       </div>
     );
   }

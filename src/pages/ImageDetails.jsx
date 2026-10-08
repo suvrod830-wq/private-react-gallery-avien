@@ -19,7 +19,7 @@ import { getImageBySlug, getRelatedImages, getAdjacentImages, recordImageView } 
 import { cloudinaryUrl, cloudinaryOriginal } from '../lib/cloudinary';
 import { ErrorState, ConfigMissing } from '../components/ui/Feedback';
 import { formatDate, formatNumber, formatFileSize } from '../utils/format';
-import { isSupabaseConfigured } from '../lib/env';
+import { isConfigured } from '../lib/env';
 import { useToast } from '../contexts/ToastContext';
 
 export default function ImageDetails() {
@@ -40,7 +40,7 @@ export default function ImageDetails() {
   });
 
   useEffect(() => {
-    if (!isSupabaseConfigured) {
+    if (!isConfigured) {
       setLoading(false);
       return;
     }
@@ -95,10 +95,10 @@ export default function ImageDetails() {
     }
   }
 
-  if (!isSupabaseConfigured) {
+  if (!isConfigured) {
     return (
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6">
-        <ConfigMissing message="Connect Supabase and Cloudinary (see README.md) to view image details." />
+        <ConfigMissing message="Configure the backend and Cloudinary (see README.md) to view image details." />
       </div>
     );
   }

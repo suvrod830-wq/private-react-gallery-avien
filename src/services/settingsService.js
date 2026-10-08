@@ -1,18 +1,15 @@
-import { supabase } from '../lib/supabase';
+import { apiRequest } from '../lib/api';
+import { isConfigured } from '../lib/env';
 import { ensureConfigured } from './notConfigured';
-import { logActivity } from './activityService';
 
 export async function getSettings() {
-  if (!supabase) ensureConfigured();
-  const { data, error } = await supabase.from('settings').select('*').limit(1).maybeSingle();
-  if (error) throw error;
-  return data;
+  if (!isConfigured) ensureConfigured();
+  return apiRequest('/settings');
 }
 
 export async function updateSettings(patch) {
-  if (!supabase) ensureConfigured();
-  const { data, error } = await supabase.from('settings').update(patch).eq('id', patch.id).select().single();
-  if (error) throw error;
-  await logActivity('Updated settings', 'settings', null, { fields: Object.keys(patch) });
-  return data;
+  if (!isConfigured) ensureConfigured();
+  // The server records the activity-log entry itself.
+  const { id: _id, ...body } = patch;
+  return apiRequest('/settings', { method: 'PATCH', body });
 }

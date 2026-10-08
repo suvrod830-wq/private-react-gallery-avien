@@ -1,54 +1,86 @@
-import { supabaseAdmin } from './supabase.js';
-import { serverEnvErrors } from './env.js';
+// Authorization helpers for the API layer.
+//
+// Supabase Auth is gone. Identity now works like this:
+//   1. POST /api/auth/login checks email + bcrypt password_hash against the
+//      `profiles` table and issues a signed JWT (see jwt.js).
+//   2. Every protected request sends `Authorization: Bearer <token>`.
+//   3. We verify the JWT and resolve the CURRENT profile row from Postgres
+//      (the role claim in the token is never trusted blindly — a demoted or
+//      deleted user is rejected immediately).
+
+import { db, dbConfigured } from './db.js';
+import { bearerToken, verifyToken } from './jwt.js';
+import { coreEnvErrors } from './env.js';
 
 /**
- * Authenticate a request's Supabase access token and verify the caller is an
- * admin. The browser role value is never trusted — we resolve the real role
- * from the `profiles` table via the service-role client (spec §34, §64).
- *
- * @param {object} req - Incoming request
- * @returns {Promise<{ok: true, user: object, profile: object} | {ok: false, status: number, error: string}>}
+ * Resolve the authenticated profile for a request, or null.
+ * @param {object} req
+ * @returns {Promise<object|null>} profiles row (id, email, display_name, role, avatar_url)
  */
-export async function requireAdmin(req) {
-  if (!supabaseAdmin) {
-    const vars = serverEnvErrors().filter((v) => v.includes('SUPABASE'));
-    return {
-      ok: false,
-      status: 503,
-      error: `Server not configured. Missing Supabase server-side variables: ${vars.join(', ') || 'SUPABASE_SERVICE_ROLE_KEY and/or VITE_SUPABASE_URL'}. Add them to your .env file (server-only section, never exposed in the browser).`,
-    };
-  }
+export async function getAuthUser(req) {
+  const token = bearerToken(req.headers?.authorization);
+  if (!token) return null;
+
+  const payload = verifyToken(token);
+  if (!payload?.sub) return null;
+
+  if (!dbConfigured()) return null;
+
+  const { rows } = await db.query(
+    `select id, email, display_name, role, avatar_url
+       from public.profiles
+      where id = $1`,
+    [payload.sub],
+  );
+  return rows[0] ?? null;
+}
+
+function missingCoreResponse() {
+  const vars = coreEnvErrors();
+  return {
+    ok: false,
+    status: 503,
+    error: `Server not configured. Missing: ${vars.join(', ')}. Add them to your .env file (server-only section, never exposed in the browser).`,
+  };
+}
+
+/**
+ * Require any authenticated profile (used by /api/auth/me).
+ */
+export async function requireAuth(req) {
+  if (!dbConfigured() || !process.env.JWT_SECRET) return missingCoreResponse();
 
   const header = req.headers?.authorization || '';
-  const token = header.startsWith('Bearer ') ? header.slice(7) : '';
-
-  if (!token) {
+  if (!bearerToken(header)) {
     return { ok: false, status: 401, error: 'Authentication required.' };
   }
 
-  const { data, error } = await supabaseAdmin.auth.getUser(token);
-  if (error || !data.user) {
+  const profile = await getAuthUser(req);
+  if (!profile) {
     return { ok: false, status: 401, error: 'Invalid or expired session.' };
   }
-
-  const { data: profile, error: profileError } = await supabaseAdmin
-    .from('profiles')
-    .select('id, email, role, display_name')
-    .eq('id', data.user.id)
-    .maybeSingle();
-
-  if (profileError) {
-    return { ok: false, status: 500, error: 'Failed to verify administrator.' };
-  }
-
-  if (!profile || profile.role !== 'admin') {
-    return { ok: false, status: 403, error: 'Administrator access required.' };
-  }
-
-  return { ok: true, user: data.user, profile };
+  return { ok: true, profile };
 }
 
-/** Shared JSON response helpers (works for both Vercel & Express). */
+/**
+ * Authenticate the request's JWT and verify the caller is an admin.
+ * The browser role value is never trusted — we resolve the real role from
+ * the `profiles` table on every request.
+ *
+ * @param {object} req - Incoming request
+ * @returns {Promise<{ok: true, profile: object} | {ok: false, status: number, error: string}>}
+ */
+export async function requireAdmin(req) {
+  const auth = await requireAuth(req);
+  if (!auth.ok) return auth;
+
+  if (auth.profile.role !== 'admin') {
+    return { ok: false, status: 403, error: 'Administrator access required.' };
+  }
+  return { ok: true, profile: auth.profile };
+}
+
+/** Shared JSON response helper (works for both Vercel & Express). */
 export function json(res, status, body) {
   res.status(status);
   res.setHeader?.('Content-Type', 'application/json');

@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "A production-ready personal image gallery CMS. React + Vite + Tailwind, Aiven PostgreSQL (migration from Supabase in progress), Cloudinary storage/CDN, Vercel serverless signed uploads.",
+  "description": "A production-ready personal image gallery CMS. React + Vite + Tailwind, Aiven PostgreSQL + JWT auth, Cloudinary storage/CDN, Vercel serverless signed uploads.",
   "engines": {
     "node": ">=20.0.0"
   },
@@ -23,8 +23,9 @@
     "test:aiven:functions": "node scripts/test-aiven-functions.mjs"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.45.0",
+    "bcryptjs": "^3.0.2",
     "cloudinary": "^2.5.0",
+    "jsonwebtoken": "^9.0.2",
     "lucide-react": "^0.469.0",
     "pg": "^8.23.1",
     "react": "^19.0.0",

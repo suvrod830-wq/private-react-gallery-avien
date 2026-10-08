@@ -31,7 +31,7 @@ const STATUS_LABEL = {
 /**
  * Multi-image upload with per-image metadata (spec §37, §38).
  * Order: validate file → signed upload to Cloudinary → validate metadata →
- * save to Supabase → success. A failed image never blocks the others.
+ * save to the database → success. A failed image never blocks the others.
  */
 export function ImageUploadForm({
   categories,
@@ -131,7 +131,7 @@ export function ImageUploadForm({
         ),
       );
 
-      // 2. Validate + save metadata to Supabase
+      // 2. Validate + save metadata via the API (Aiven PostgreSQL)
       const { meta } = item;
       if (!meta.title.trim() || meta.title.trim().length < 2) {
         throw new Error(
