@@ -4,10 +4,10 @@
 //   { action: 'add_tags',    ids: [...], tag_ids: [...] }
 //   { action: 'remove_tags', ids: [...], tag_ids: [...] }
 
-import { db } from '../_lib/db.js';
-import { requireAdmin } from '../_lib/auth.js';
-import { json, readJsonBody, requireDb, route } from '../_lib/http.js';
-import { logActivity } from '../_lib/activity.js';
+import { db } from '../../db.js';
+import { requireAdmin } from '../../auth.js';
+import { json, readJsonBody, requireDb, route } from '../../http.js';
+import { logActivity } from '../../activity.js';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const uuids = (arr) => (Array.isArray(arr) ? arr.filter((x) => typeof x === 'string' && UUID_RE.test(x)) : []);

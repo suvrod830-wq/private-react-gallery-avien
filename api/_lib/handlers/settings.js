@@ -1,10 +1,10 @@
 // GET   /api/settings — public site settings (single row)
 // PATCH /api/settings — admin update
 
-import { db } from '../_lib/db.js';
-import { requireAdmin } from '../_lib/auth.js';
-import { json, readJsonBody, requireDb, route } from '../_lib/http.js';
-import { logActivity } from '../_lib/activity.js';
+import { db } from '../db.js';
+import { requireAdmin } from '../auth.js';
+import { json, readJsonBody, requireDb, route } from '../http.js';
+import { logActivity } from '../activity.js';
 
 const UPDATABLE = [
   'site_title', 'site_description', 'logo_url', 'favicon_url',

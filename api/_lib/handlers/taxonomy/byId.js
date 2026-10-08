@@ -1,12 +1,12 @@
 // PATCH  /api/taxonomy/:table/:id — admin update (rename recomputes the slug)
 // DELETE /api/taxonomy/:table/:id — admin delete
 
-import { db } from '../../_lib/db.js';
-import { requireAdmin } from '../../_lib/auth.js';
-import { json, readJsonBody, requireDb, route } from '../../_lib/http.js';
-import { getTaxonomy } from '../../_lib/taxonomy.js';
-import { slugify } from '../../_lib/slug.js';
-import { logActivity } from '../../_lib/activity.js';
+import { db } from '../../db.js';
+import { requireAdmin } from '../../auth.js';
+import { json, readJsonBody, requireDb, route } from '../../http.js';
+import { getTaxonomy } from '../../taxonomy.js';
+import { slugify } from '../../slug.js';
+import { logActivity } from '../../activity.js';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 

@@ -7,10 +7,10 @@
 // The frontend POSTs these + the file as multipart/form-data to
 //   https://api.cloudinary.com/v1_1/<cloud>/image/upload
 
-import { requireAdmin } from '../_lib/auth.js';
-import { json, readJsonBody, route } from '../_lib/http.js';
-import { cloudinary } from '../_lib/cloudinary.js';
-import { serverEnv, serverReady, serverEnvErrors } from '../_lib/env.js';
+import { requireAdmin } from '../../auth.js';
+import { json, readJsonBody, route } from '../../http.js';
+import { cloudinary } from '../../cloudinary.js';
+import { serverEnv, serverReady, serverEnvErrors } from '../../env.js';
 
 const handler = route(async (req, res) => {
   if (req.method !== 'POST') {

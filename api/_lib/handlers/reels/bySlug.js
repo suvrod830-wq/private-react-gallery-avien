@@ -1,9 +1,9 @@
 // GET /api/reels/by-slug/:slug — public single-reel lookup.
 // Drafts are only returned when a valid admin JWT is presented.
 
-import { db } from '../../_lib/db.js';
-import { getAuthUser } from '../../_lib/auth.js';
-import { json, requireDb, route } from '../../_lib/http.js';
+import { db } from '../../db.js';
+import { getAuthUser } from '../../auth.js';
+import { json, requireDb, route } from '../../http.js';
 
 const handler = route(async (req, res) => {
   if (req.method !== 'GET') {

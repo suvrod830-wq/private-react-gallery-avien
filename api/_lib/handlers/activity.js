@@ -1,8 +1,8 @@
 // GET /api/activity?limit=N — recent admin activity log entries.
 
-import { db } from './_lib/db.js';
-import { requireAdmin } from './_lib/auth.js';
-import { json, requireDb, route } from './_lib/http.js';
+import { db } from '../db.js';
+import { requireAdmin } from '../auth.js';
+import { json, requireDb, route } from '../http.js';
 
 const handler = route(async (req, res) => {
   if (req.method !== 'GET') {

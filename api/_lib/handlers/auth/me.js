@@ -2,8 +2,8 @@
 // Returns the profile belonging to the presented JWT. Used by the frontend on
 // page load to restore the signed-in session.
 
-import { requireAuth } from '../_lib/auth.js';
-import { json, route } from '../_lib/http.js';
+import { requireAuth } from '../../auth.js';
+import { json, route } from '../../http.js';
 
 const handler = route(async (req, res) => {
   if (req.method !== 'GET') {
