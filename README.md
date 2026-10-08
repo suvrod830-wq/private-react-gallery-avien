@@ -304,17 +304,14 @@ npm run build
 ## 9. Project structure
 
 ```
-api/                    Vercel serverless functions (same code runs in dev)
-  auth/                 login.js, me.js (JWT)
-  images/               index, [id], by-slug/[slug], view, bulk
-  reels/                index, [id], by-slug/[slug], view
-  taxonomy/[table]/     index, slug/[slug], [id]
-  settings/             index.js
-  stats.js activity.js  dashboard stats / activity log
-  cloudinary/           sign.js, delete.js (images + videos)
-  _lib/                 auth (JWT), db (pg pool), jwt, env, http, slug, taxonomy, activity
+api/                    ONE Vercel Serverless Function (Hobby-plan limit: 12)
+  [...route].js         catch-all entry → api/_lib/router.js dispatcher
+  _lib/                 auth (JWT), db (pg pool), jwt, env, http, slug, taxonomy
+  _lib/handlers/        the endpoint logic (auth, images, reels, taxonomy,
+                        settings, stats, activity, cloudinary sign/delete)
+  _lib/router.js        URL → handler table (used by Vercel AND dev server)
 aiven/migrations/       SQL schema + functions (run via npm run migrate:aiven)
-server/index.js         Local Express API (mounts the same handlers)
+server/index.js         Local Express API (same dispatcher as Vercel)
 scripts/                create-admin, apply-migrations, aiven checks, smoke
 src/
   components/           ui, layout, gallery, filters, forms, admin, taxonomy
@@ -339,6 +336,7 @@ src/
 | Old Supabase env vars still in `.env` | Delete them — they are ignored; the app only uses `DATABASE_URL`/`JWT_SECRET` now |
 | Upload returns 503 | Check `CLOUDINARY_API_KEY`/`SECRET` are set **on the server**, not just `VITE_` |
 | `Invalid Signature` on upload | 1) Fully stop and re-run `npm run dev` (the API process doesn't hot-reload). 2) Run `node scripts/check-cloudinary.mjs` — it verifies your key/secret belong to your cloud and prints the exact expected signature |
+| Vercel: "No more than 12 Serverless Functions" | Solved in this repo: the whole API is ONE catch-all function (`api/[...route].js`). If you see it again, make sure no extra files were added directly under `api/` (only `_lib/` + `[...route].js` may live there) |
 | Upload fails validation | Use JPEG/PNG/WebP/AVIF/GIF ≤ 15 MB |
 | Drafts visible publicly | Impossible without an admin JWT — check no admin token is stored in that browser |
 | Cloudinary delete fails | Retry — the app reports the failure and lets you reconcile |

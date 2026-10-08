@@ -3,10 +3,10 @@
 // Returns Cloudinary's raw result so the client can retry on failure
 // (spec §28 — never pretend a failed deletion succeeded).
 
-import { requireAdmin } from '../_lib/auth.js';
-import { json, readJsonBody, route } from '../_lib/http.js';
-import { cloudinary } from '../_lib/cloudinary.js';
-import { serverReady } from '../_lib/env.js';
+import { requireAdmin } from '../../auth.js';
+import { json, readJsonBody, route } from '../../http.js';
+import { cloudinary } from '../../cloudinary.js';
+import { serverReady } from '../../env.js';
 
 const handler = route(async (req, res) => {
   if (req.method !== 'POST') {

@@ -8,11 +8,11 @@
 // The heavy lifting happens in the database function list_images(jsonb),
 // created by aiven/migrations/0001_initial_schema.sql.
 
-import { db } from '../_lib/db.js';
-import { getAuthUser, requireAdmin } from '../_lib/auth.js';
-import { json, readJsonBody, requireDb, route } from '../_lib/http.js';
-import { uniqueSlug } from '../_lib/slug.js';
-import { logActivity } from '../_lib/activity.js';
+import { db } from '../../db.js';
+import { getAuthUser, requireAdmin } from '../../auth.js';
+import { json, readJsonBody, requireDb, route } from '../../http.js';
+import { uniqueSlug } from '../../slug.js';
+import { logActivity } from '../../activity.js';
 
 const SORTS = new Set(['newest', 'oldest', 'most_viewed', 'recently_updated', 'title_asc', 'title_desc']);
 

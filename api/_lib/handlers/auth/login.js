@@ -6,9 +6,9 @@
 // Response: { token, profile: { id, email, display_name, role, avatar_url } }
 
 import bcrypt from 'bcryptjs';
-import { db } from '../_lib/db.js';
-import { signToken } from '../_lib/jwt.js';
-import { json, readJsonBody, requireDb, route } from '../_lib/http.js';
+import { db } from '../../db.js';
+import { signToken } from '../../jwt.js';
+import { json, readJsonBody, requireDb, route } from '../../http.js';
 
 const handler = route(async (req, res) => {
   if (req.method !== 'POST') {

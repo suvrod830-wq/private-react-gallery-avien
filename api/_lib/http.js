@@ -35,28 +35,32 @@ export function readJsonBody(req) {
       }
       return;
     }
-    // Case 3: No middleware — read the raw stream (Vercel or plain Node).
+    // Case 3: read the raw stream (Vercel or plain Node).
+    // IMPORTANT: even when the request finished arriving while we were
+    // awaiting auth/DB work (req.complete === true), the chunks are still
+    // buffered in paused mode — attaching 'data' below starts the flow and
+    // delivers them. Never short-circuit on req.complete here (that bug made
+    // bodies read as {} whenever an await ran before readJsonBody).
     let data = '';
-    const onData = (chunk) => {
-      data += chunk;
-      if (data.length > 1_000_000) req.destroy();
-    };
-    const onEnd = () => {
+    let settled = false;
+    const finish = () => {
+      if (settled) return;
+      settled = true;
       try { resolve(data ? JSON.parse(data) : {}); }
       catch { resolve({}); }
     };
-    const onError = () => resolve({});
-    req.on('data', onData);
-    req.on('end', onEnd);
-    req.on('error', onError);
-
-    // If body was already consumed before we attached listeners, end silently.
-    if (req.complete || req.readableEnded) {
-      req.removeListener('data', onData);
-      req.removeListener('end', onEnd);
-      req.removeListener('error', onError);
-      resolve({});
-    }
+    req.on('data', (chunk) => {
+      data += chunk;
+      if (data.length > 1_000_000) req.destroy();
+    });
+    req.on('end', finish);
+    req.on('aborted', finish);
+    req.on('error', () => {
+      if (!settled) {
+        settled = true;
+        resolve({});
+      }
+    });
   });
 }
 

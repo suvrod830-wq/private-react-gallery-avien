@@ -4,12 +4,12 @@
 //   DELETE → remove row, then best-effort destroy the Cloudinary VIDEO asset
 //            (+ optional dedicated thumbnail image asset)
 
-import { db } from '../_lib/db.js';
-import { requireAdmin } from '../_lib/auth.js';
-import { json, readJsonBody, requireDb, route } from '../_lib/http.js';
-import { uniqueSlug } from '../_lib/slug.js';
-import { logActivity } from '../_lib/activity.js';
-import { cloudinary } from '../_lib/cloudinary.js';
+import { db } from '../../db.js';
+import { requireAdmin } from '../../auth.js';
+import { json, readJsonBody, requireDb, route } from '../../http.js';
+import { uniqueSlug } from '../../slug.js';
+import { logActivity } from '../../activity.js';
+import { cloudinary } from '../../cloudinary.js';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 

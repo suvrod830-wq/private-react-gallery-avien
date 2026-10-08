@@ -1,8 +1,8 @@
 // GET /api/taxonomy/:table/slug/:slug — public lookup by slug (detail pages).
 
-import { db } from '../../../_lib/db.js';
-import { json, requireDb, route } from '../../../_lib/http.js';
-import { getTaxonomy } from '../../../_lib/taxonomy.js';
+import { db } from '../../db.js';
+import { json, requireDb, route } from '../../http.js';
+import { getTaxonomy } from '../../taxonomy.js';
 
 const handler = route(async (req, res) => {
   if (req.method !== 'GET') {

@@ -6,12 +6,12 @@
 //   GET ?plain=1   → plain rows (id, name, slug, …) for form dropdowns — public
 //   POST           → create (admin only; slug computed server-side)
 
-import { db } from '../../_lib/db.js';
-import { requireAdmin } from '../../_lib/auth.js';
-import { json, readJsonBody, requireDb, route } from '../../_lib/http.js';
-import { getTaxonomy } from '../../_lib/taxonomy.js';
-import { uniqueSlug } from '../../_lib/slug.js';
-import { logActivity } from '../../_lib/activity.js';
+import { db } from '../../db.js';
+import { requireAdmin } from '../../auth.js';
+import { json, readJsonBody, requireDb, route } from '../../http.js';
+import { getTaxonomy } from '../../taxonomy.js';
+import { uniqueSlug } from '../../slug.js';
+import { logActivity } from '../../activity.js';
 
 async function list(req, res, table) {
   if (req.query.plain === '1') {
