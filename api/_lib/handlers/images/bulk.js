@@ -38,7 +38,14 @@ const handler = route(async (req, res) => {
 
     if ('is_published' in patch) {
       setCol('is_published', Boolean(patch.is_published));
-      setCol('published_at', patch.is_published ? new Date().toISOString() : null);
+      // Publishing must not clobber the original publish date of images that
+      // are already live (matches the single-image PATCH behaviour, which only
+      // stamps published_at on FIRST publish). Unpublishing clears it.
+      if (patch.is_published) {
+        sets.push('published_at = coalesce(published_at, now())');
+      } else {
+        sets.push('published_at = null');
+      }
     }
     if ('is_featured' in patch) setCol('is_featured', Boolean(patch.is_featured));
     if ('category_id' in patch) setCol('category_id', patch.category_id || null);
