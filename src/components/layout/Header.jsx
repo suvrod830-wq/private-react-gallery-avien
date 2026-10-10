@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { Menu, X, Camera, LayoutDashboard, Search, Lock, User } from 'lucide-react';
+import {
+  Menu, X, LayoutDashboard, Search, Lock, User, Eye, EyeOff,
+} from 'lucide-react';
 import { ThemeToggle } from '../ui/ThemeToggle';
 import { useAuth } from '../../contexts/AuthContext';
 import { PUBLIC_ROUTES } from '../../utils/constants';
 import { usePoster } from '../../contexts/PosterContext';
-import { Eye, EyeOff } from 'lucide-react';
 
 const linkClass = ({ isActive }) =>
   `rounded-lg px-3 py-2 text-sm font-medium transition-colors ${isActive
@@ -73,7 +74,7 @@ export function Header() {
         </div>
 
         {open && (
-          <nav className="border-t border-stone-200 bg-white px-4 py-3  dark:border-stone-800 dark:bg-stone-950" aria-label="Mobile">
+          <nav className="border-t border-stone-200 bg-white px-4 py-3 dark:border-stone-800 dark:bg-stone-950" aria-label="Mobile">
             <div className="flex flex-col gap-1">
               {PUBLIC_ROUTES.map((r) => (
                 <NavLink key={r.path} to={r.path} className={linkClass} onClick={() => setOpen(false)}>
@@ -88,9 +89,8 @@ export function Header() {
             </div>
           </nav>
         )}
-
       </header>
-      <div className="fixed top-[70%] right-2 md:right-4 bg-white/50 backdrop-blur-2xl p-2 z-50 flex flex-col gap-2 rounded-lg"> 
+      <div className="fixed top-[70%] right-2 md:right-4 bg-white/50 backdrop-blur-2xl p-2 z-50 flex flex-col gap-2 rounded-lg">
         <button
           type="button"
           onClick={togglePoster}
@@ -112,7 +112,7 @@ export function Header() {
         <Link to="/admin/login"
           className="size-8 md:size-10 inline-flex items-center gap-2 rounded-lg border border-stone-200 bg-white p-2 md:p-3 text-sm font-medium text-stone-600 hover:bg-stone-100 dark:border-stone-700 dark:bg-stone-800 dark:text-stone-300 dark:hover:bg-stone-700 transition-colors cursor-pointer"
         >
-          <Lock />
+          <Lock className="h-4 w-4" aria-hidden />
         </Link>
       </div>
     </>
