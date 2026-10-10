@@ -95,11 +95,27 @@ function matchRoute(method, segments) {
  * Works under both Vercel (req.query pre-populated) and Express (req.params).
  */
 export function dispatch(req, res) {
-  // Derive the path after /api.
-  let path = req.url || '';
-  path = path.split('?')[0];
-  let segments = path.replace(/\/+$/, '').split('/').filter(Boolean);
+  // Vercel normally provides the original URL in req.url. Depending on the
+  // routing/rewrite path, however, a catch-all function can receive a URL
+  // containing only the query string while the matched path is available in
+  // req.query.route. Prefer the URL, then fall back to Vercel's catch-all
+  // parameter so /api/taxonomy/* does not incorrectly become a 404.
+  const rawPath = String(req.url || '').split('?')[0];
+  let segments = rawPath.replace(/\/+$/, '').split('/').filter(Boolean);
   if (segments[0] === 'api') segments = segments.slice(1);
+
+  const routeParam = req.query?.route;
+  const routeSegments = Array.isArray(routeParam)
+    ? routeParam.map(String).filter(Boolean)
+    : typeof routeParam === 'string'
+      ? routeParam.split('/').filter(Boolean)
+      : [];
+
+  // If the URL is empty or contains a framework placeholder (rather than the
+  // original path), use Vercel's decoded catch-all parameter.
+  if (segments.length === 0 && routeSegments.length > 0) {
+    segments = routeSegments;
+  }
 
   if (segments.length === 1 && segments[0] === 'health') {
     res.status(200);
@@ -107,7 +123,12 @@ export function dispatch(req, res) {
     return res.end(JSON.stringify({ ok: true }));
   }
 
-  const match = matchRoute(req.method, segments);
+  let match = matchRoute(req.method, segments);
+  // Also retry the route parameter when req.url was populated with a rewrite
+  // target/placeholder that is non-empty but does not match an API route.
+  if (!match && routeSegments.length > 0) {
+    match = matchRoute(req.method, routeSegments);
+  }
   if (!match) {
     res.status(404);
     res.setHeader('Content-Type', 'application/json');
