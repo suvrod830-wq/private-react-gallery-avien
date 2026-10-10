@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { Menu, X, Camera, LayoutDashboard, Search, Lock } from 'lucide-react';
+import { Menu, X, Camera, LayoutDashboard, Search, Lock, User } from 'lucide-react';
 import { ThemeToggle } from '../ui/ThemeToggle';
 import { useAuth } from '../../contexts/AuthContext';
 import { PUBLIC_ROUTES } from '../../utils/constants';
@@ -24,10 +24,7 @@ export function Header() {
       <header className="sticky top-0 z-40 border-b border-stone-200 bg-white/80 backdrop-blur dark:border-stone-800 dark:bg-stone-950/80">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
           <Link to="/" className="flex items-center gap-2.5" aria-label="Gallery home">
-            <span className="grid h-9 w-9 place-items-center rounded-xl bg-stone-900 text-brand-400 dark:bg-stone-800">
-              <Camera className="h-5 w-5" aria-hidden />
-            </span>
-            <span className="font-display text-lg font-semibold tracking-tight">Personal Gallery</span>
+            <img src="/logo.webp" alt="logo" className="w-auto h-10 site_logo" />
           </Link>
 
           <nav className="hidden items-center gap-1 lg:flex" aria-label="Main">
@@ -50,7 +47,7 @@ export function Header() {
               type="button"
               onClick={() => navigate('/gallery')}
               aria-label="Search gallery"
-              className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-stone-200 bg-white text-stone-500 hover:bg-stone-100 dark:border-stone-700 dark:bg-stone-800 dark:text-stone-300"
+              className="!hidden inline-flex h-9 w-9 items-center justify-center rounded-lg border border-stone-200 bg-white text-stone-500 hover:bg-stone-100 dark:border-stone-700 dark:bg-stone-800 dark:text-stone-300"
             >
               <Search className="h-4 w-4" aria-hidden />
             </button>
@@ -58,14 +55,14 @@ export function Header() {
             {!user && (
               <Link
                 to="/admin/login"
-                className="hidden rounded-lg px-3 py-1.5 text-sm font-medium text-stone-500 hover:text-stone-900 dark:text-stone-400 sm:inline-block"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-stone-200 lg:hidden dark:border-stone-700"
               >
-                Admin
+                <User className="h-5 w-5" />
               </Link>
             )}
             <button
               type="button"
-              className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-stone-200 lg:hidden dark:border-stone-700"
+              className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-stone-200 lg:hidden dark:border-stone-700"
               onClick={() => setOpen((v) => !v)}
               aria-expanded={open}
               aria-label="Toggle menu"
@@ -76,7 +73,7 @@ export function Header() {
         </div>
 
         {open && (
-          <nav className="border-t border-stone-200 bg-white px-4 py-3 lg:hidden dark:border-stone-800 dark:bg-stone-950" aria-label="Mobile">
+          <nav className="border-t border-stone-200 bg-white px-4 py-3  dark:border-stone-800 dark:bg-stone-950" aria-label="Mobile">
             <div className="flex flex-col gap-1">
               {PUBLIC_ROUTES.map((r) => (
                 <NavLink key={r.path} to={r.path} className={linkClass} onClick={() => setOpen(false)}>

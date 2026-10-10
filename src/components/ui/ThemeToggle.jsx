@@ -12,9 +12,9 @@ export function ThemeToggle() {
       onClick={() => setTheme(next)}
       aria-label={`Theme: ${preference}. Switch to ${next}.`}
       title={`Theme: ${preference} (switch to ${next})`}
-      className="inline-flex items-center gap-1.5 rounded-lg border border-stone-200 bg-white px-2.5 py-1.5 text-sm text-stone-600 transition-colors hover:bg-stone-100 dark:border-stone-700 dark:bg-stone-800 dark:text-stone-300 dark:hover:bg-stone-700"
+      className="inline-flex w-9 h-9 items-center gap-1.5 rounded-lg border border-stone-200 bg-white px-2.5 py-1.5 text-sm text-stone-600 transition-colors hover:bg-stone-100 dark:border-stone-700 dark:bg-stone-800 dark:text-stone-300 dark:hover:bg-stone-700"
     >
-      <Icon className="h-4 w-4" aria-hidden />
+      <Icon className="h-5 w-5" aria-hidden />
       <span className="hidden capitalize sm:inline">{preference}</span>
       {preference === 'system' && <Monitor className="hidden h-3.5 w-3.5 sm:inline" aria-hidden />}
     </button>
