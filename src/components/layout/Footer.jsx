@@ -4,7 +4,7 @@ import { Camera } from 'lucide-react';
 export function Footer() {
   return (
     <footer className="border-t border-stone-200 bg-white py-10 dark:border-stone-800 dark:bg-stone-950">
-      <div className="mx-auto grid max-w-7xl gap-8 px-4 sm:px-6 md:grid-cols-3">
+      <div className="hidden mx-auto grid max-w-7xl gap-8 px-4 sm:px-6 md:grid-cols-3">
         <div>
           <div className="flex items-center gap-2">
             <span className="grid h-8 w-8 place-items-center rounded-lg bg-stone-900 text-brand-400 dark:bg-stone-800">
@@ -32,7 +32,7 @@ export function Footer() {
           </ul>
         </div>
       </div>
-      <div className="mx-auto mt-8 max-w-7xl border-t border-stone-100 px-4 pt-6 text-center text-xs text-stone-400 dark:border-stone-800 dark:text-stone-500">
+      <div className="mx-auto max-w-7xl text-center text-xs text-stone-400 dark:border-stone-800 dark:text-stone-500">
         © {new Date().getFullYear()} Personal Gallery. All rights reserved.
       </div>
     </footer>

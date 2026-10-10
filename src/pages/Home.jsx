@@ -65,27 +65,27 @@ export default function Home() {
             }`}
           />
         )}
-        <div className="relative mx-auto max-w-7xl px-4 py-24 text-center sm:px-6 sm:py-32">
+        <div className="relative mx-auto max-w-7xl px-4 py-16 text-center sm:px-6 sm:py-24">
           <p className="mx-auto mb-4 flex w-fit items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-medium text-brand-200 backdrop-blur">
             <Camera className="h-3.5 w-3.5" aria-hidden /> A personal collection of photographs
           </p>
-          <h1 className="mx-auto max-w-3xl font-display text-4xl font-semibold leading-tight text-white sm:text-6xl">
-            Moments, captured and curated.
+          <h1 className="mx-auto max-w-xl font-display text-2xl font-bold leading-tight text-white sm:text-4xl">
+            Making gallery collections whatever likes
           </h1>
-          <p className="mx-auto mt-5 max-w-xl text-base text-stone-300 sm:text-lg">
+          <p className="mx-auto mt-3 max-w-xl text-sm md:text-sm text-stone-300 sm:text-lg">
             Browse a growing gallery of personal photography — search, filter by category and tag, and explore curated
             albums.
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
             <Link
               to="/gallery"
-              className="inline-flex h-12 items-center gap-2 rounded-xl bg-brand-500 px-6 font-medium text-white shadow-lg transition-colors hover:bg-brand-600"
+              className="inline-flex h-10 text-sm items-center gap-2 rounded-lg bg-brand-500 px-4 font-medium text-white shadow-lg transition-colors hover:bg-brand-600"
             >
               Browse gallery <ArrowRight className="h-4 w-4" aria-hidden />
             </Link>
             <Link
               to="/categories"
-              className="inline-flex h-12 items-center rounded-xl border border-white/25 px-6 font-medium text-white transition-colors hover:bg-white/10"
+              className="inline-flex h-10 text-sm items-center rounded-lg border border-white/25 px-4 font-medium text-white transition-colors hover:bg-white/10"
             >
               Explore categories
             </Link>
@@ -174,7 +174,7 @@ export default function Home() {
       )}
 
       {/* CTA */}
-      <section className="border-t border-stone-200 bg-white py-16 text-center dark:border-stone-800 dark:bg-stone-900">
+      <section className="border-t border-stone-200 bg-white py-16 text-center dark:border-stone-800 dark:bg-stone-900 hidden">
         <h2 className="font-display text-2xl font-semibold">Ready to explore?</h2>
         <p className="mx-auto mt-2 max-w-md text-sm text-stone-500 dark:text-stone-400">
           Open the full gallery with search, filters, and sorting.
